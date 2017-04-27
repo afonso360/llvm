@@ -198,6 +198,27 @@ impl Builder {
         }
     }
 
+    pub fn build_fadd(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+        let c_name = CString::new(name).unwrap();
+        unsafe {
+            llvm::LLVMBuildFAdd(self.ptr, lhs, rhs, c_name.as_ptr())
+        }
+    }
+
+    pub fn build_fsub(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+        let c_name = CString::new(name).unwrap();
+        unsafe {
+            llvm::LLVMBuildFSub(self.ptr, lhs, rhs, c_name.as_ptr())
+        }
+    }
+
+    pub fn build_fmul(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+        let c_name = CString::new(name).unwrap();
+        unsafe {
+            llvm::LLVMBuildFMul(self.ptr, lhs, rhs, c_name.as_ptr())
+        }
+    }
+
     pub fn build_add(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
         let c_name = CString::new(name).unwrap();
         unsafe {
