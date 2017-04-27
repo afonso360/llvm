@@ -10,3 +10,7 @@ license = "MIT"
 llvm-sys = "*"
 libc = "*"
 
+interpolate_idents = { version = "0.1.6", optional = "true" }
+
+[features]
+gen_ir = ["interpolate_idents"]

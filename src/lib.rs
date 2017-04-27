@@ -1,3 +1,6 @@
+#![cfg_attr(feature="gen_ir", feature(plugin))]
+#![cfg_attr(feature="gen_ir", plugin(interpolate_idents))]
+
 extern crate libc;
 extern crate llvm_sys;
 
@@ -6,15 +9,13 @@ use std::ffi::{CString, CStr};
 use llvm_sys::prelude::*;
 use llvm_sys::core as llvm;
 
-// This should only be used for static strings
-macro_rules! c_str_to_str {
-    ($s:expr) => {
-        ::std::str::from_utf8(CStr::from_ptr($s).to_bytes()).unwrap()
-    }
-}
-
 #[macro_use]
 mod macros;
+
+#[cfg(feature="gen_ir")]
+#[macro_use]
+mod gen_ir;
+
 mod context;
 mod types;
 mod builder;

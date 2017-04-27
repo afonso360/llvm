@@ -4,27 +4,61 @@ use llvm_sys::core as llvm;
 
 use super::*;
 
+macro_rules! inst_list {
+    (@inner $bfn: ident, $build_fn: path, $($argn: ident : $argty: ty),*) => {
+        impl Builder {
+            // We might not always return valueref
+            pub fn $bfn(&mut self, $($argn: $argty),*) -> LLVMValueRef {
+                unsafe {
+                    $build_fn(self.ptr, $($argn),*)
+                }
+            }
+        }
+    };
+    (@inner $bfn: ident, $($argn: ident : $argty: ty),* => $b: block) => {
+        impl Builder {
+            // We might not always return valueref
+            pub fn $bfn(&mut self, $($argn: $argty),*) -> LLVMValueRef { unsafe { $b } }
+        }
+    };
+    (@inner $bfn: ident, $build_fn: path) => {
+        impl Builder {
+            // We might not always return valueref
+            pub fn $bfn(&mut self) -> LLVMValueRef { unsafe { $build_fn(self.ptr) } }
+        }
+    };
+    ({ $(($bfn: ident, $($rest:tt)*))* }) => {
+        $(
+            inst_list!(@inner $bfn, $($rest)*);
+        )*
+    }
+}
+
 pub struct Builder {
     pub ptr: LLVMBuilderRef
 }
 impl_llvm_ref!(Builder, LLVMBuilderRef);
 
+//add_inst!("retvoid", build_ret_void, llvm::LLVMBuildRetVoid);
+inst_list!({
+    (build_ret,       llvm::LLVMBuildRet,       ret_val: LLVMValueRef)
+
+    (build_ret_void,  llvm::LLVMBuildRetVoid)
+
+    (build_store,     llvm::LLVMBuildStore,     val: LLVMValueRef,
+                                                ptr: LLVMValueRef)
+
+    (build_br,        llvm::LLVMBuildBr,        dest: LLVMBasicBlockRef)
+
+    (build_cond_br,   llvm::LLVMBuildCondBr,    cond: LLVMValueRef,
+                                                then: LLVMBasicBlockRef,
+                                                else_: LLVMBasicBlockRef)
+});
+
 impl Builder {
     pub fn position_at_end(&mut self, basic_block: LLVMBasicBlockRef) {
         unsafe {
             llvm::LLVMPositionBuilderAtEnd(self.ptr, basic_block);
-        }
-    }
-
-    pub fn build_ret(&mut self, ret_val: LLVMValueRef) -> LLVMValueRef {
-        unsafe {
-            llvm::LLVMBuildRet(self.ptr, ret_val)
-        }
-    }
-
-    pub fn build_ret_void(&self) -> LLVMValueRef {
-        unsafe {
-            llvm::LLVMBuildRetVoid(self.ptr)
         }
     }
 
@@ -35,11 +69,6 @@ impl Builder {
         }
     }
 
-    pub fn build_store(&mut self, val: LLVMValueRef, ptr: LLVMValueRef) -> LLVMValueRef {
-        unsafe {
-            llvm::LLVMBuildStore(self.ptr, val, ptr)
-        }
-    }
 
     pub fn build_load(&mut self, ptr: LLVMValueRef, name: &str) -> LLVMValueRef {
         let c_name = CString::new(name).unwrap();
@@ -116,18 +145,6 @@ impl Builder {
         }
     }
 
-    pub fn build_cond_br(&self, cond: LLVMValueRef, then: LLVMBasicBlockRef,
-                         else_: LLVMBasicBlockRef) -> LLVMValueRef {
-        unsafe {
-            llvm::LLVMBuildCondBr(self.ptr, cond, then, else_)
-        }
-    }
-
-    pub fn build_br(&self, dest: LLVMBasicBlockRef) -> LLVMValueRef {
-        unsafe {
-            llvm::LLVMBuildBr(self.ptr, dest)
-        }
-    }
 
 }
 
