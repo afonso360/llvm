@@ -13,10 +13,7 @@ macro_rules! build_op_str {
                     $fn(self.ptr, $($argn),*, c_name.as_ptr())
                 }
             }
-        }
-    }
 }
-
 macro_rules! build_op {
     ($op_name: ident, $fn: path, $($argn: ident: $argv: path),*) => {
         impl Builder {
@@ -32,6 +29,7 @@ macro_rules! build_op {
 pub struct Builder {
     pub ptr: LLVMBuilderRef
 }
+impl_llvm_ref!(Builder, LLVMBuilderRef);
 
 // http://llvm.org/docs/doxygen/html/group__LLVMCCoreInstructionBuilder.html
 //TODO: Get/Set Volatile
