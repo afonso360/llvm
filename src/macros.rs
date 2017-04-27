@@ -16,3 +16,11 @@ macro_rules! impl_llvm_ref {
         }
     }
 }
+
+// This should only be used for static strings
+macro_rules! c_str_to_str {
+    ($s:expr) => {
+        ::std::str::from_utf8(CStr::from_ptr($s).to_bytes()).unwrap()
+    }
+}
+
