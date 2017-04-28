@@ -13,6 +13,8 @@ macro_rules! build_op_str {
                     $fn(self.ptr, $($argn),*, c_name.as_ptr())
                 }
             }
+        }
+    }
 }
 macro_rules! build_op {
     ($op_name: ident, $fn: path, $($argn: ident: $argv: path),*) => {
@@ -198,54 +200,6 @@ impl Builder {
         }
     }
 
-    pub fn build_fadd(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
-        let c_name = CString::new(name).unwrap();
-        unsafe {
-            llvm::LLVMBuildFAdd(self.ptr, lhs, rhs, c_name.as_ptr())
-        }
-    }
-
-    pub fn build_fsub(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
-        let c_name = CString::new(name).unwrap();
-        unsafe {
-            llvm::LLVMBuildFSub(self.ptr, lhs, rhs, c_name.as_ptr())
-        }
-    }
-
-    pub fn build_fmul(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
-        let c_name = CString::new(name).unwrap();
-        unsafe {
-            llvm::LLVMBuildFMul(self.ptr, lhs, rhs, c_name.as_ptr())
-        }
-    }
-
-    pub fn build_add(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
-        let c_name = CString::new(name).unwrap();
-        unsafe {
-            llvm::LLVMBuildAdd(self.ptr, lhs, rhs, c_name.as_ptr())
-        }
-    }
-
-    pub fn build_sub(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
-        let c_name = CString::new(name).unwrap();
-        unsafe {
-            llvm::LLVMBuildSub(self.ptr, lhs, rhs, c_name.as_ptr())
-        }
-    }
-
-    pub fn build_mul(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
-        let c_name = CString::new(name).unwrap();
-        unsafe {
-            llvm::LLVMBuildMul(self.ptr, lhs, rhs, c_name.as_ptr())
-        }
-    }
-
-    pub fn build_sdiv(&mut self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
-        let c_name = CString::new(name).unwrap();
-        unsafe {
-            llvm::LLVMBuildSDiv(self.ptr, lhs, rhs, c_name.as_ptr())
-        }
-    }
     pub fn build_global_string(&self, s: &str, name: &str) -> LLVMValueRef {
         let c_s = CString::new(s).unwrap();
         let c_name = CString::new(name).unwrap();
